@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { apiService } from '../service/session.service';
 import { DateCard } from '../components/DateCard';
 import { PhotoUploader } from '../components/PhotoUploader';
-import { ArrowLeft, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, Loader2, Info, ListFilter } from 'lucide-react';
 import type { DateIdea } from '../types/types';
 
 export function GamePage() {
@@ -65,29 +65,31 @@ export function GamePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 pb-24 relative">
+        <div className="min-h-screen bg-gray-50 flex flex-col p-6 pb-24">
+            <div className="flex items-start justify-between gap-4">
+                <button
+                    onClick={() => navigate('/')}
+                    className="shrink-0 text-gray-400 hover:text-gray-600 flex items-center gap-1 font-medium"
+                >
+                    <ArrowLeft size={20} /> Salir
+                </button>
 
-            <button
-                onClick={() => navigate('/')}
-                className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 flex items-center gap-1 font-medium z-10"
-            >
-                <ArrowLeft size={20} /> Salir
-            </button>
+                {sessionData && (
+                    <div className="text-right min-w-0">
+                        <h2 className="text-xs font-black text-pink-500 uppercase tracking-widest truncate">
+                            {sessionData.name}
+                        </h2>
+                        {sessionData.description && (
+                            <p className="text-[10px] text-gray-400 max-w-40 truncate">
+                                {sessionData.description}
+                            </p>
+                        )}
+                    </div>
+                )}
+            </div>
 
-            {sessionData && (
-                <div className="absolute top-6 right-6 text-right z-10">
-                    <h2 className="text-xs font-black text-pink-500 uppercase tracking-widest">
-                        {sessionData.name}
-                    </h2>
-                    {sessionData.description && (
-                        <p className="text-[10px] text-gray-400 max-w-40 truncate">
-                            {sessionData.description}
-                        </p>
-                    )}
-                </div>
-            )}
-
-            {viewState === 'roulette' && (
+            <div className="flex-1 flex flex-col items-center justify-center">
+                {viewState === 'roulette' && (
                 <div className="text-center animate-in zoom-in duration-300 w-full max-w-md">
                     <h1 className="text-4xl font-black text-gray-800 mb-2">100 Citas</h1>
 
@@ -121,6 +123,16 @@ export function GamePage() {
                             )}
                         </button>
                     </div>
+
+                    {sessionId && (
+                        <Link
+                            to={`/game/${sessionId}/explorar`}
+                            className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-pink-500 transition-colors focus-visible:ring-2 focus-visible:ring-pink-500 outline-none rounded-full px-3 py-2"
+                        >
+                            <ListFilter size={16} />
+                            Explorar las 100 citas
+                        </Link>
+                    )}
                 </div>
             )}
 
@@ -147,6 +159,7 @@ export function GamePage() {
                     )}
                 </div>
             )}
+            </div>
         </div>
     );
 }

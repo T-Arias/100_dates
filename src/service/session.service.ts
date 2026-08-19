@@ -69,7 +69,7 @@ export const apiService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("No estás logueado");
 
-        // Pequeña función interna para subir 1 foto y devolver la URL
+        // Pequeña función interna para subir 1 foto y devolver la ruta + URL
         const uploadPhoto = async (file: File) => {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
@@ -79,25 +79,36 @@ export const apiService = {
             if (error) throw error;
 
             const { data } = supabase.storage.from('photos').getPublicUrl(filePath);
-            return data.publicUrl;
+            return { path: filePath, url: data.publicUrl };
         };
 
-        const url1 = await uploadPhoto(files[0]);
-        const url2 = await uploadPhoto(files[1]);
+        const photo1 = await uploadPhoto(files[0]);
+        const photo2 = await uploadPhoto(files[1]);
 
         // Guardamos el registro con las 2 URLs
-        const { error: dbError } = await supabase
+        const { data: memory, error: dbError } = await supabase
             .from('memories')
             .insert({
                 session_id: sessionId,
                 date_idea_id: dateIdeaId,
                 user_id: user.id,
-                photo_url: url1,
-                photo_url_2: url2
-            });
+                photo_url: photo1.url,
+                photo_url_2: photo2.url
+            })
+            .select()
+            .single();
 
-        if (dbError) throw dbError;
-        return true;
+        if (dbError) {
+            // Evita fotos huérfanas en el bucket si el insert falla (p.ej. la pareja ya cargó esta cita).
+            await supabase.storage.from('photos').remove([photo1.path, photo2.path]);
+
+            if (dbError.code === '23505') {
+                throw Object.assign(new Error('DUPLICATE_MEMORY'), { code: 'DUPLICATE_MEMORY' });
+            }
+            throw dbError;
+        }
+
+        return memory;
     },
 
     async getMemories() {
