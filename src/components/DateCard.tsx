@@ -1,13 +1,5 @@
 import type { DateIdea } from '../types/types.ts';
-import { Heart, Flame, Utensils, Coffee } from 'lucide-react';
-
-// Diccionario de iconos según categoría
-const CATEGORY_ICONS = {
-    'Romántica': <Heart className="text-pink-500" />,
-    'Aventura': <Flame className="text-orange-500" />,
-    'Gastronomía': <Utensils className="text-yellow-600" />,
-    'Relax': <Coffee className="text-blue-500" />
-};
+import { getCategoryMeta } from '../lib/categories';
 
 interface DateCardProps {
     idea: DateIdea;
@@ -16,13 +8,16 @@ interface DateCardProps {
 }
 
 export function DateCard({ idea, onAccept, onReject }: DateCardProps) {
+    const categoryMeta = getCategoryMeta(idea.category);
+    const CategoryIcon = categoryMeta.icon;
+
     return (
         <div className="w-full max-w-sm mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-bottom-5 duration-500">
 
             {/* Cabecera con Categoría y Dificultad */}
             <div className="bg-pink-50 p-6 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    {CATEGORY_ICONS[idea.category]}
+                    <CategoryIcon className={categoryMeta.textClass} />
                     <span className="text-sm font-bold text-pink-900 uppercase tracking-wider">
                         {idea.category}
                     </span>
