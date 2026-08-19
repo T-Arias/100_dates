@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { GalleryPage } from './pages/GalleryPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { GamePage } from './pages/GamePage';
+import { CatalogPage } from './pages/CatalogPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AuthScreen } from './components/AuthScreen';
 import { BottomNav } from './components/BottomNav';
@@ -41,6 +42,7 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/game/:sessionId" element={<GamePage />} />
+          <Route path="/game/:sessionId/explorar" element={<CatalogPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/gallery" element={<GalleryPage />} />
         </Routes>
